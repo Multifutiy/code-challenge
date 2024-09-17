@@ -98,9 +98,18 @@ jobs:
         run: |
           docker build -f Dockerfile.rails -t my-rails-app:latest .
       
+      - name: Build react Docker image
+        run: |
+          docker build -f Dockerfile.react -t my-react-app:latest .
+
       - name: Build NGINX Docker image
         run: |
-          docker build -f Dockerfile.nginx -t my-nginx-app:latest .
+          docker build -f Dockerfile.react -t my-react-app:latest .
+
+      - name: Push react Docker image
+        run: |
+          docker tag my-react-app:latest shate1/my-react-app:latest
+          docker push shate1/my-react-app:latest
 
       - name: Push Rails Docker image
         run: |
@@ -126,12 +135,13 @@ jobs:
 
   container-security-scanning:
     name: Container Security Scanning
+    needs: build_and_push_docker_images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Scan Docker image for vulnerabilities
-        uses: aquasecurity/trivy-action@v0.2.0
+        uses: aquasecurity/aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
           image-ref: 'shate1/my-rails-app:latest'
