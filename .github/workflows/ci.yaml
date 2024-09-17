@@ -44,11 +44,6 @@ jobs:
       - name: Run Snyk Open Source Monitor
         run: snyk monitor --all-projects || true
 
-      - name: Upload Snyk Code Results to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: snyk-code.sarif
-
 #####
   build_and_push_docker_images:
     runs-on: ubuntu-latest
