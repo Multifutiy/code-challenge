@@ -112,19 +112,6 @@ jobs:
           docker tag my-nginx-app:latest shate1/my-nginx-app:latest
           docker push shate1/my-nginx-app:latest
 
-  container-security-scanning:
-    name: Container Security Scanning
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Scan Docker image for vulnerabilities
-        uses: aquasecurity/trivy-action@v0.2.0
-        with:
-          image-ref: 'your-image:latest'
-
-
   secret-scanning:
     name: Secret Scanning
     runs-on: ubuntu-latest
@@ -132,7 +119,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Используем инструмент для поиска секретов, например, Gitleaks
       - name: Run Gitleaks
         uses: zricethezav/gitleaks-action@v1
         with:
@@ -145,7 +131,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Сканируем контейнер с помощью Trivy (или другого инструмента)
       - name: Scan Docker image for vulnerabilities
         uses: aquasecurity/trivy-action@v0.2.0
         with:
