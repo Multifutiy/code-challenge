@@ -1,0 +1,68 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  snyk:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Snyk CLI
+        uses: snyk/actions/setup@v2
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Snyk Code test
+        run: snyk code test --sarif > snyk-code.sarif || true
+
+      - name: Snyk Open Source monitor
+        run: snyk monitor --all-projects || true
+
+      - name: Build a Docker image
+        run: docker build -t your/image-to-test .
+
+      - name: Snyk Container monitor
+        run: snyk container monitor your/image-to-test --file=Dockerfile || true
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-code.sarif
+
+#####
+
+  build_docker_images:
+    runs-on: ubuntu-latest
+    needs: test  
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}   
+          password: ${{ secrets.DOCKER_PASSWORD }}   
+
+      - name: Build Rails Docker image
+        run: |
+          - docker build -f Dockerfile.rails -t my-rails-app:latest .
+          - docker build -f Dockerfile.nginx -t my-nginx-app:latest .
+
+      - name: Push NGINX Docker image
+        run: |
+          - docker push my-nginx-app:latest
+          - docker push my-react-app:latest
+          - docker push my-rails-app:latest
