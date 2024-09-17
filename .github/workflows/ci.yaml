@@ -44,6 +44,42 @@ jobs:
       - name: Run Snyk Open Source Monitor
         run: snyk monitor --all-projects || true
 
+  sast:
+    name: Static Application Security Testing (SAST)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: 'ruby,JavaScript' 
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        continue-on-error: false 
+
+  dependency-scanning:
+    name: Dependency Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run OWASP Dependency-Check
+        uses: jeremylong/gh-dependency-check-action@v2
+        with:
+          format: 'HTML' 
+          scan: '.'  
+
+      - name: Upload Dependency Scan Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-scan-report
+          path: dependency-check-report.html
+
+
 #####
   build_and_push_docker_images:
     runs-on: ubuntu-latest
@@ -75,3 +111,42 @@ jobs:
         run: |
           docker tag my-nginx-app:latest shate1/my-nginx-app:latest
           docker push shate1/my-nginx-app:latest
+
+  container-security-scanning:
+    name: Container Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@v0.2.0
+        with:
+          image-ref: 'your-image:latest'
+
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Используем инструмент для поиска секретов, например, Gitleaks
+      - name: Run Gitleaks
+        uses: zricethezav/gitleaks-action@v1
+        with:
+          config-path: '.gitleaks.toml'
+
+  container-security-scanning:
+    name: Container Security Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Сканируем контейнер с помощью Trivy (или другого инструмента)
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@v0.2.0
+        with:
+          image-ref: 'shate1/my-rails-app:latest'
