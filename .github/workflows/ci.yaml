@@ -22,7 +22,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-jobs:
   snyk:
     permissions:
       actions: read
