@@ -96,29 +96,15 @@ jobs:
 
       - name: Build Rails Docker image
         run: |
-          docker build -f Dockerfile.rails -t my-rails-app:latest .
+          docker build -f Dockerfile.rails -t shate1/my-rails-app:latest .
+          docker build -f Dockerfile.nginx -t shate1/my-react-app:latest .
+          docker build -f Dockerfile.react -t shate1/my-react-app:latest .
       
-      - name: Build react Docker image
-        run: |
-          docker build -f Dockerfile.react -t my-react-app:latest .
-
-      - name: Build NGINX Docker image
-        run: |
-          docker build -f Dockerfile.react -t my-react-app:latest .
 
       - name: Push react Docker image
         run: |
-          docker tag my-react-app:latest shate1/my-react-app:latest
           docker push shate1/my-react-app:latest
-
-      - name: Push Rails Docker image
-        run: |
-          docker tag my-rails-app:latest shate1/my-rails-app:latest
           docker push shate1/my-rails-app:latest
-
-      - name: Push NGINX Docker image
-        run: |
-          docker tag my-nginx-app:latest shate1/my-nginx-app:latest
           docker push shate1/my-nginx-app:latest
 
   secret-scanning:
@@ -145,3 +131,25 @@ jobs:
         uses: aquasecurity/aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
           image-ref: 'shate1/my-rails-app:latest'
+
+
+      - name: Install Falco
+        run: |
+          sudo apt-get install -y dkms
+          curl -s https://falco.org/repo/falcosecurity-packages.asc | sudo apt-key add -
+          sudo apt-get -y install software-properties-common
+          sudo add-apt-repository -y ppa:falco-ppa/stable
+          sudo apt-get update
+          sudo apt-get install -y falco
+
+      - name: Start Falco for monitoring
+        run: |
+          sudo falco -D > falco.log 2>&1 &
+          echo "Falco is running in background"
+
+
+      - name: Upload Falco log
+        uses: actions/upload-artifact@v3
+        with:
+          name: falco-log
+          path: falco.log
