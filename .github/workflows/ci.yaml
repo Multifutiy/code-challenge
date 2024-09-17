@@ -1,11 +1,11 @@
-name: Test_Code
+name: ci
 
 on:
   workflow_run:
-    workflows: ["Test"]
+    workflows: ["Test_Code"]
     types:
       - completed 
-      
+
 jobs: 
   build_and_push_docker_images:
     runs-on: ubuntu-latest
