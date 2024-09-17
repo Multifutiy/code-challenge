@@ -44,9 +44,6 @@ jobs:
       - name: Run Snyk Open Source Monitor
         run: snyk monitor --all-projects || true
 
-      - name: Build Docker Image
-        run: docker build -t your/image-to-test .
-
       - name: Upload Snyk Code Results to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
