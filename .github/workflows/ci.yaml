@@ -120,8 +120,8 @@ jobs:
     needs: build_and_push_docker_images
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # - name: Checkout repository
+      #   uses: actions/checkout@v3
 
       - name: Scan Docker image for vulnerabilities shate1/my-rails-app:latest'
         uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
@@ -144,31 +144,5 @@ jobs:
         with:
           image-ref: 'shate1/my-ruby-app:latest'
           severity: 'HIGH,CRITICAL'
-          exit-code: 0
-        continue-on-error: true
-
-      - name: Fail pipeline if vulnerabilities found
-        run: |
-          VULNERABILITIES_FOUND=false
-          
-          if grep -q "Vulnerabilities found" trivy_scan_rails.log; then
-            echo "Vulnerabilities found in Rails app"
-            VULNERABILITIES_FOUND=true
-          fi
-
-          if grep -q "Vulnerabilities found" trivy_scan_nginx.log; then
-            echo "Vulnerabilities found in Nginx app"
-            VULNERABILITIES_FOUND=true
-          fi
-
-          if grep -q "Vulnerabilities found" trivy_scan_ruby.log; then
-            echo "Vulnerabilities found in Ruby app"
-            VULNERABILITIES_FOUND=true
-          fi
-
-          if [ "$VULNERABILITIES_FOUND" = true ]; then
-            echo "Critical vulnerabilities found. Failing the pipeline."
-            exit 1
-          else
-            echo "No critical vulnerabilities found."
-          fi
+          exit-code: 1
+       
