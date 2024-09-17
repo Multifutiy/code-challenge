@@ -97,7 +97,7 @@ jobs:
       - name: Build Rails Docker image
         run: |
           docker build -f Dockerfile.rails -t shate1/my-rails-app:latest .
-          docker build -f Dockerfile.nginx -t shate1/my-react-app:latest .
+          docker build -f Dockerfile.nginx -t shate1/my-nginx-app:latest .
           docker build -f Dockerfile.react -t shate1/my-react-app:latest .
       
 
