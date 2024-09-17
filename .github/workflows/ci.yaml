@@ -19,24 +19,34 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Snyk CLI
-        uses: snyk/actions/setup@806182742461562b67788a64410098c9d9b96adb
+        uses: snyk/actions/setup@v2
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       - name: Snyk Code test
-        run: snyk code test --sarif > snyk-code.sarif #|| true
+        run: snyk code test --sarif > snyk-code.sarif || true
 
       - name: Snyk Open Source monitor
-        run: snyk monitor --all-projects #|| true
+        run: snyk monitor --all-projects --json > snyk-monitor-report.json || true
 
       - name: Snyk Container monitor
-        run: snyk container monitor your/image-to-test --file=Dockerfile #|| true
+        run: snyk container monitor your/image-to-test --file=Dockerfile --json > snyk-container-report.json || true
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk-code.sarif
 
+      - name: Check vulnerabilities
+        run: |
+          snyk code test || exit_code=$?
+          snyk test --json > snyk-test-output.json || exit_code=$?
+          snyk container test your/image-to-test --file=Dockerfile || exit_code=$?
+
+          if [ "$exit_code" -ne 0 ]; then
+            echo "Vulnerabilities found. Abort Pipe."
+            exit $exit_code
+          fi
 #####
   build_and_push_docker_images:
     runs-on: ubuntu-latest
