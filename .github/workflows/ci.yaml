@@ -127,29 +127,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Scan Docker image for vulnerabilities
+      - name: Scan Docker image for vulnerabilities shate1/my-rails-app:latest'
         uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
           image-ref: 'shate1/my-rails-app:latest'
 
 
-      - name: Install Falco
-        run: |
-          sudo apt-get install -y dkms
-          curl -s https://falco.org/repo/falcosecurity-packages.asc | sudo apt-key add -
-          sudo apt-get -y install software-properties-common
-          sudo add-apt-repository -y ppa:falco-ppa/stable
-          sudo apt-get update
-          sudo apt-get install -y falco
-
-      - name: Start Falco for monitoring
-        run: |
-          sudo falco -D > falco.log 2>&1 &
-          echo "Falco is running in background"
-
-
-      - name: Upload Falco log
-        uses: actions/upload-artifact@v3
+      - name: Scan Docker image for vulnerabilities shate1/my-nginx-app:latest'
+        uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
-          name: falco-log
-          path: falco.log
+          image-ref: 'shate1/my-nginx-app:latest'
+
+      - name: Scan Docker image for vulnerabilities shate1/my-ruby-app:latest'
+        uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
+        with:
+          image-ref: 'shate1/my-ruby-app:latest'
