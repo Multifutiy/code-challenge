@@ -5,11 +5,12 @@ on:
     workflows: ["Test_Code"]
     types:
       - completed 
-    if: ${{ github.event.workflow_run.conclusion != 'success' }} 
+    
 
 jobs: 
   build_and_push_docker_images:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'success' }} 
     steps:
 
       # - name: Fail if Test failed
